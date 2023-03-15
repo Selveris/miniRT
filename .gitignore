@@ -1,0 +1,22 @@
+#####
+# basic ignore
+#####
+*.tmp
+resources/*
+*/test*
+*.swp
+
+
+
+#####
+# C specific ignore
+#####
+*/a.out
+*.o
+
+
+
+#####
+# Folder specific ignore
+#####
+minishell
