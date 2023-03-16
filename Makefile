@@ -16,7 +16,7 @@ MLX			= $(MLX_DIR)/libmlx.a
 HEAD_NAME	= miniRT.h
 HEADERS		:= $(patsubst %.h, $(INCL_DIR)/%.h, $(HEAD_NAME))
 
-SRCS_NAME	= miniRT.c conf.c
+SRCS_NAME	= miniRT.c conf.c camera.c vector.c
 SRCS		:= $(patsubst %.c, $(SRCS_DIR)/%.c, $(SRCS_NAME))
 OBJS 		:= $(patsubst $(SRCS_DIR)/%.c, $(OBJS_DIR)/%.o, $(SRCS))
 
@@ -43,6 +43,11 @@ bin:
 					mkdir -p $@
 
 #-------------------------------------------------------------------------------------------------#
+
+norm:
+					@norminette $(LIBFT_DIR)
+					@norminette $(INCL_DIR)
+					@norminette $(SRCS_DIR)
 
 leaks:				
 					leaks --atExit -- ./$(NAME)

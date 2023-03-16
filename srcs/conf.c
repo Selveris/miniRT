@@ -33,7 +33,7 @@ t_ses	*start_session(void)
 		ft_putstr_fd("Error\nSession creation failed\n", 2);
 		return (NULL);
 	}
-	mlx_hook(ses->win, DESTROY_NOTIFY, 0, close_session, &ses);
+	mlx_hook(ses->win, DESTROY_NOTIFY, 0, close_session, ses);
 	mlx_key_hook(ses->win, key_hook, ses);
 	mlx_loop_hook(ses->mlx, loop_hook, ses);
 	return (ses);

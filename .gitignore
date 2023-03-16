@@ -19,4 +19,4 @@ resources/*
 #####
 # Folder specific ignore
 #####
-minishell
+miniRT
