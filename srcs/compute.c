@@ -30,15 +30,41 @@ static t_intersect	compute_closest_intersect(t_scene const *scene,
 	return (m_intersect);
 }
 
-static t_color	compute_phong(t_ambiant const *ambiant, t_list const *lights, 
-		t_intersect const *intersect)
+static t_color	compute_phong(t_ambiant const *ambiant, t_list *lights, 
+		t_intersect const *intersect, t_v3 view_dir)
 {
 	t_color	color;
-	(void) lights;
+	t_v3	l;
+	t_v3	r;
+	t_light	*light;
+	double	d;
+	double	s;
 
-	color.red = ambiant->strength * ambiant->color.red * intersect->obj->color.red / 255;
-	color.green = ambiant->strength * ambiant->color.green * intersect->obj->color.green / 255;
-	color.blue = ambiant->strength * ambiant->color.blue * intersect->obj->color.blue / 255;
+	color.red = ambiant->color.red * intersect->obj->mat.reflection_ratio.x;
+	color.green = ambiant->color.green * intersect->obj->mat.reflection_ratio.y;
+	color.blue = ambiant->color.blue * intersect->obj->mat.reflection_ratio.z;
+	while (lights)
+	{
+		light = lights->content;
+		l = v_direction_to(intersect->point, (light->origin));
+		d = v_dot(l, intersect->normal);
+		if (d > 0)
+		{
+			color.red += intersect->obj->mat.reflection_ratio.x * d * light->color.red;
+			color.green += intersect->obj->mat.reflection_ratio.y * d * light->color.green;
+			color.blue += intersect->obj->mat.reflection_ratio.z * d * light->color.blue;
+			r = v_add(v_scalarmul(intersect->normal, 2 * v_dot(l, intersect->normal)), v_scalarmul(l, -1));
+			s = v_dot(r, view_dir);
+			if (s > 0)
+			{
+				s = intersect->obj->mat.specular_ratio * pow(s, intersect->obj->mat.shininess);
+				color.red += s * light->color.red;
+				color.green += s * light->color.green;
+				color.blue += s * light->color.blue;
+			}
+		}
+		lights = lights->next;
+	}
 	return (color);
 }
 
@@ -49,7 +75,7 @@ static t_color	compute_color(t_scene const *scene, t_ray const *ray){
 	intersect = compute_closest_intersect(scene, ray);
 	if (intersect.obj)
 	{
-		color = compute_phong(&scene->ambiant, scene->lights, &intersect);
+		color = compute_phong(&scene->ambiant, scene->lights, &intersect, v_scalarmul(ray->dir, -1));
 	}
 	else
 		color = scene->background;

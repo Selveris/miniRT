@@ -19,7 +19,7 @@ double	plane_intersect(t_ray const *ray, t_obj const *obj,
 	}
 	intersect->point = ray_forward(ray, dist);
 	if (angle > 0)
-		intersect->normal = v_reverse(plane->normal);
+		intersect->normal = v_scalarmul(plane->normal, -1);
 	else
 		intersect->normal = plane->normal;
 	intersect->obj = obj;

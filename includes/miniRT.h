@@ -80,14 +80,12 @@ typedef struct s_cam
 
 typedef struct s_ambiant
 {
-	double	strength;
 	t_color	color;
 }	t_ambiant;
 
 typedef struct s_light
 {
 	t_v3	origin;
-	double	strength;
 	t_color	color;
 }	t_light;
 
@@ -96,6 +94,13 @@ typedef struct s_plane
 	double	dist;
 	t_v3	normal;
 }	t_plane;
+
+typedef struct s_mat
+{
+	t_v3	reflection_ratio;
+	double	specular_ratio;
+	double	shininess;
+}	t_mat;
 
 typedef enum e_OType
 {
@@ -106,7 +111,7 @@ typedef enum e_OType
 typedef struct s_obj
 {
 	t_OType	type;
-	t_color	color;
+	t_mat	mat;
 	union u_obj
 	{
 		t_plane	plane;
@@ -133,10 +138,11 @@ void	init_cam_dir(t_cam *cam, t_v3 const dir);
 t_ray	cam_pixel_to_ray(t_cam const *cam, int i, int j);
 
 static const t_v3	V_ZERO = {0, 0, 0};
-t_v3	v_reverse(t_v3 v);
+t_v3	v_scalarmul(t_v3 v, double s);
+t_v3	v_add(t_v3 a, t_v3 b);
 t_v3	v_normalize(t_v3 v);
-t_v3	v_cross(t_v3 a, t_v3 b);
 double	v_dot(t_v3 a, t_v3 b);
+t_v3	v_direction_to(t_v3 origin, t_v3 dest);
 t_v3	ray_forward(t_ray const *ray, double dist);
 
 double	plane_intersect(t_ray const *ray, t_obj const *obj,

@@ -20,10 +20,8 @@ void	test(t_ses *ses)
 	scene.cam.fov = 140;
 	init_cam_dir(&scene.cam, v_normalize(dir));
 	scene.background = C_BLACK;
-	scene.ambiant.strength = 1;
-	scene.ambiant.color.red = 125;
-	scene.ambiant.color.green = 72;
-	scene.ambiant.color.blue = 180;
+	double	ai = 0.1;
+	scene.ambiant.color = (t_color) {255 * ai, 255 * ai, 255 * ai};
 
 	t_obj	plane;
 	plane.type = O_PLANE;
@@ -31,10 +29,16 @@ void	test(t_ses *ses)
 	plane.geometry.plane.normal.y = 1;
 	plane.geometry.plane.normal.z = 0;
 	plane.geometry.plane.dist = 0;
-	plane.color.red = 140;
-	plane.color.green = 37;
-	plane.color.blue = 206;
+	plane.mat.reflection_ratio = (t_v3) {200, 150, 0};
+	plane.mat.reflection_ratio = v_scalarmul(plane.mat.reflection_ratio, 1.0/255);
+	plane.mat.specular_ratio = 0.2;
+	plane.mat.shininess = 0.5;
 	scene.objs = ft_lstnew(&plane);
+
+	t_light	light;
+	light.origin = (t_v3) {0, 10, -3};
+	light.color = C_WHITE;
+	scene.lights = ft_lstnew(&light);
 	
 	window = img_create(ses->mlx, WIN_W, WIN_H);
 	compute_scene(&scene, window);
