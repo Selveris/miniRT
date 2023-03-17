@@ -22,8 +22,33 @@ int		loop_hook(t_ses *ses);
 
 
 //---------------------------------//
+//              Image              //
+//---------------------------------//
+typedef struct s_color
+{
+	unsigned char	red;
+	unsigned char	green;
+	unsigned char	blue;
+}	t_color;
+
+typedef struct s_img
+{
+	void			*mlx_img;
+	int				bpp;
+	int				l_size;
+	int				endian;
+	unsigned char	*data;
+}	t_img;
+
+t_img	*img_create(void *mlx, int width, int height);
+void	img_destroy(void *mlx, t_img **img);
+void	img_set_pixel(t_img *img, int i, int j, t_color color);
+
+
+//---------------------------------//
 //           RT Objects            //
 //---------------------------------//
+# include <libft.h>
 
 typedef struct s_v3
 {
@@ -37,13 +62,6 @@ typedef struct s_ray
 	t_v3	origin;
 	t_v3	dir;
 }	t_ray;
-
-typedef struct s_color
-{
-	unsigned char	red;
-	unsigned char	green;
-	unsigned char	blue;
-}	t_color;
 
 typedef struct s_cam
 {
@@ -67,28 +85,28 @@ typedef struct s_light
 	t_color	color;
 }	t_light;
 
-typedef struct s_plan
+typedef struct s_plane
 {
-	t_v3	origin;
+	double	dist;
 	t_v3	normal;
-	t_color	color;
-}	t_plan;
+}	t_plane;
 
 typedef enum e_OType
 {
-	O_PLAN,
+	O_PLANE,
 	O_LAST
 }	t_OType;
 
 typedef struct s_obj
 {
 	t_OType	type;
+	t_color	color;
 	union u_obj
 	{
-		t_plan	plan;
+		t_plane	plane;
 	}	data;
 }	t_obj;
-/*
+
 typedef struct s_scene
 {
 	t_cam		cam;
@@ -96,18 +114,32 @@ typedef struct s_scene
 	t_list		*lights;
 	t_list		*objs;
 }	t_scene;
-*/
+
 typedef struct s_intersect
 {
-	t_obj	*obj;
-	t_v3	point;
-	t_v3	normal;
+	t_obj const	*obj;
+	t_v3		point;
+	t_v3		normal;
 }	t_intersect;
 
 void	init_cam_dir(t_cam *cam, t_v3 const dir);
 t_ray	cam_pixel_to_ray(t_cam const *cam, int i, int j);
 
 static const t_v3	V_ZERO = {0, 0, 0};
+t_v3	v_reverse(t_v3 v);
 t_v3	v_normalize(t_v3 v);
+t_v3	v_cross(t_v3 a, t_v3 b);
+double	v_dot(t_v3 a, t_v3 b);
+t_v3	ray_forward(t_ray const *ray, double dist);
+
+double	plane_intersect(t_ray const *ray, t_obj const *obj,
+						t_intersect *intersect);
+static double(*const obj_intersect[O_LAST])(t_ray const *ray, t_obj const *obj,
+		t_intersect *intersect) = {
+	&plane_intersect,
+};
+
+
+void	compute_scene(t_scene const *scene, t_img *img);
 
 #endif
