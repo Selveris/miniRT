@@ -19,16 +19,21 @@ void	test(t_ses *ses)
 	scene.cam.origin.y = 1;
 	scene.cam.fov = 140;
 	init_cam_dir(&scene.cam, v_normalize(dir));
+	scene.background = C_BLACK;
+	scene.ambiant.strength = 1;
+	scene.ambiant.color.red = 125;
+	scene.ambiant.color.green = 72;
+	scene.ambiant.color.blue = 180;
 
 	t_obj	plane;
 	plane.type = O_PLANE;
-	plane.data.plane.normal.x = 0;
-	plane.data.plane.normal.y = 1;
-	plane.data.plane.normal.z = 0;
-	plane.data.plane.dist = 0;
-	plane.color.red = 50;
-	plane.color.green = 200;
-	plane.color.blue = 50;
+	plane.geometry.plane.normal.x = 0;
+	plane.geometry.plane.normal.y = 1;
+	plane.geometry.plane.normal.z = 0;
+	plane.geometry.plane.dist = 0;
+	plane.color.red = 140;
+	plane.color.green = 37;
+	plane.color.blue = 206;
 	scene.objs = ft_lstnew(&plane);
 	
 	window = img_create(ses->mlx, WIN_W, WIN_H);

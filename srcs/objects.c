@@ -8,7 +8,7 @@ double	plane_intersect(t_ray const *ray, t_obj const *obj,
 	double			dist;
 	t_plane const	*plane;
 
-	plane = &obj->data.plane;
+	plane = &obj->geometry.plane;
 	angle = v_dot(plane->normal, ray->dir);
 	if (angle)
 		dist = -(v_dot(plane->normal, ray->origin) + plane->dist) / angle;

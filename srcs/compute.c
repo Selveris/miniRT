@@ -30,6 +30,18 @@ static t_intersect	compute_closest_intersect(t_scene const *scene,
 	return (m_intersect);
 }
 
+static t_color	compute_phong(t_ambiant const *ambiant, t_list const *lights, 
+		t_intersect const *intersect)
+{
+	t_color	color;
+	(void) lights;
+
+	color.red = ambiant->strength * ambiant->color.red * intersect->obj->color.red / 255;
+	color.green = ambiant->strength * ambiant->color.green * intersect->obj->color.green / 255;
+	color.blue = ambiant->strength * ambiant->color.blue * intersect->obj->color.blue / 255;
+	return (color);
+}
+
 static t_color	compute_color(t_scene const *scene, t_ray const *ray){
 	t_color	color;
 	t_intersect	intersect;
@@ -37,14 +49,10 @@ static t_color	compute_color(t_scene const *scene, t_ray const *ray){
 	intersect = compute_closest_intersect(scene, ray);
 	if (intersect.obj)
 	{
-		color = intersect.obj->color;
+		color = compute_phong(&scene->ambiant, scene->lights, &intersect);
 	}
 	else
-	{
-		color.red = 0;
-		color.green = 0;
-		color.blue = 0;
-	}
+		color = scene->background;
 	return (color);
 }
 

@@ -31,6 +31,12 @@ typedef struct s_color
 	unsigned char	blue;
 }	t_color;
 
+static const t_color	C_BLACK = {0, 0, 0};
+static const t_color	C_WHITE = {255, 255, 255};
+static const t_color	C_RED = {255, 0, 0};
+static const t_color	C_GREEN = {0, 255, 0};
+static const t_color	C_BLUE = {0, 0, 255};
+
 typedef struct s_img
 {
 	void			*mlx_img;
@@ -104,12 +110,13 @@ typedef struct s_obj
 	union u_obj
 	{
 		t_plane	plane;
-	}	data;
+	}	geometry;
 }	t_obj;
 
 typedef struct s_scene
 {
 	t_cam		cam;
+	t_color		background;
 	t_ambiant	ambiant;
 	t_list		*lights;
 	t_list		*objs;
