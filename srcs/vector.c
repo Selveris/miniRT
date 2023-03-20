@@ -18,6 +18,16 @@ t_v3	v_normalize(t_v3 v)
 	return (n);
 }
 
+t_v3	v_sub(t_v3 a, t_v3 b)
+{
+	t_v3	new;
+
+	new.x = a.x - b.x;
+	new.y = a.y - b.y;
+	new.z = a.z - b.z;
+	return (new);
+}
+
 t_v3	v_add(t_v3 a, t_v3 b)
 {
 	t_v3	new;
@@ -40,7 +50,7 @@ t_v3	v_scalarmul(t_v3 v, double s)
 
 t_v3	v_direction_to(t_v3 origin, t_v3 dest)
 {
-	return (v_normalize(v_add(v_scalarmul(origin, -1), dest)));
+	return (v_normalize(v_sub(dest, origin)));
 }
 
 double	v_norm(t_v3 v)
@@ -50,7 +60,12 @@ double	v_norm(t_v3 v)
 
 double	v_distance_to(t_v3 origin, t_v3 dest)
 {
-	return (v_norm(v_add(v_scalarmul(origin, -1), dest)));
+	return (v_norm(v_sub(dest, origin)));
+}
+
+t_v3	v_symmetric(t_v3 dir, t_v3 normal)
+{
+	return (v_sub(v_scalarmul(normal, 2 * v_dot(dir, normal)), dir));
 }
 
 t_v3	ray_forward(t_ray const *ray, double dist)

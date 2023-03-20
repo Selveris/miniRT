@@ -17,7 +17,7 @@ HEAD_NAME	= miniRT.h
 HEADERS		:= $(patsubst %.h, $(INCL_DIR)/%.h, $(HEAD_NAME))
 
 SRCS_NAME	= miniRT.c conf.c camera.c vector.c objects.c compute.c img.c print.c utils.c \
-			  phong.c
+			  color.c
 SRCS		:= $(patsubst %.c, $(SRCS_DIR)/%.c, $(SRCS_NAME))
 OBJS 		:= $(patsubst $(SRCS_DIR)/%.c, $(OBJS_DIR)/%.o, $(SRCS))
 
@@ -32,12 +32,12 @@ $(NAME):			$(OBJS)
 					$(CC) $(CFLAGS) $(LIBS) -o $(NAME) $(OBJS)
 
 update:				
-					@make -C $(LIBFT_DIR)
-					@make -C $(MLX_DIR)
+					@make -sC $(LIBFT_DIR)
+					@make -sC $(MLX_DIR)
 
 #-------------------------------------------------------------------------------------------------#
 
-$(OBJS_DIR)/%.o:	$(SRCS_DIR)/%.c $(LIBFT) $(HEADERS) | bin
+$(OBJS_DIR)/%.o:	$(SRCS_DIR)/%.c $(HEADERS) | bin
 					$(CC) $(CFLAGS) $(INCLUDES) -o $@ $< -c
 
 bin:				

@@ -5,9 +5,11 @@
 //             config              //
 //---------------------------------//
 # define WIN_NAME		"-- MiniRT --"
-# define WIN_W			1680
-# define WIN_H			1050
+# define WIN_W			1920
+# define WIN_H			1080
 # define DESTROY_NOTIFY	17
+# define RAY_MAX_DEPTH	8
+# define ALIASING		4
 
 typedef struct s_session
 {
@@ -24,6 +26,10 @@ int		loop_hook(t_ses *ses);
 //---------------------------------//
 //              utils              //
 //---------------------------------//
+double	min(double a, double b);
+double	max(double a, double b);
+double	solve_quadratic(double a, double b, double c);
+
 typedef struct s_v3
 {
 	double	x;
@@ -34,21 +40,15 @@ typedef struct s_v3
 static const t_v3	V_ZERO = {0, 0, 0};
 
 t_v3	v_scalarmul(t_v3 v, double s);
+t_v3	v_sub(t_v3 a, t_v3 b);
 t_v3	v_add(t_v3 a, t_v3 b);
 double	v_norm(t_v3 v);
 t_v3	v_normalize(t_v3 v);
 double	v_dot(t_v3 a, t_v3 b);
 t_v3	v_direction_to(t_v3 origin, t_v3 dest);
 double	v_distance_to(t_v3 origin, t_v3 dest);
+t_v3	v_symmetric(t_v3 dir, t_v3 normal);
 
-double	min(double a, double b);
-double	max(double a, double b);
-double	solve_quadratic(double a, double b, double c);
-
-
-//---------------------------------//
-//              Image              //
-//---------------------------------//
 typedef struct s_color
 {
 	unsigned char	red;
@@ -61,6 +61,11 @@ static const t_color	C_WHITE = {255, 255, 255};
 static const t_color	C_RED = {255, 0, 0};
 static const t_color	C_GREEN = {0, 255, 0};
 static const t_color	C_BLUE = {0, 0, 255};
+
+void	color_add_normalized(t_color *base, t_color add);
+void	color_add_bounded(t_color *base, t_color add);
+t_color	color_vmul(t_color const base, t_v3 const *ratio);
+t_color	color_smul(t_color const base, double ratio);
 
 typedef struct s_img
 {
@@ -122,7 +127,8 @@ typedef struct s_sphere
 
 typedef struct s_mat
 {
-	t_v3	reflection_ratio;
+	t_v3	diffuse_ratio;
+	double	reflection_ratio;
 	double	specular_ratio;
 	double	shininess;
 }	t_mat;
@@ -159,6 +165,7 @@ typedef struct s_intersect
 	t_obj const	*obj;
 	t_v3		point;
 	t_v3		normal;
+	t_v3		viewer;
 }	t_intersect;
 
 void	init_cam_dir(t_cam *cam, t_v3 const dir);
@@ -184,17 +191,11 @@ void	compute_scene(t_scene const *scene, t_img *img);
 //           Phong Model           //
 //---------------------------------//
 
-t_color	color_add_normalized(t_color c1, t_color c2);
-t_color	color_add_bounded(t_color c1, t_color c2);
-t_color	phong_ambiant(t_color const *ambiant, t_v3 const *ratio);
-t_color	phong_diffuse(t_color const *light, t_v3 const *ratio, double d);
-t_color	phong_specular(t_color const *light, double ratio, double s);
-
 
 //---------------------------------//
 //             DEBUG               //
 //---------------------------------//
-void	v3_print(t_v3 const *v);
+void	v3_print(t_v3 const v);
 void	ray_print(t_ray const *ray);
 void	obj_print(t_obj const *obj);
 #endif

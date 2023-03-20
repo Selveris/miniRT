@@ -26,8 +26,10 @@ static double	compute_closest_intersect(t_scene const *scene,
 		}
 		objs = objs->next;	
 	}
-	if (m_intersect->obj)
+	if (m_intersect->obj){
+		m_intersect->viewer = v_scalarmul(ray->dir, -1);
 		return (m_dist);
+	}
 	return (-1);
 }
 
@@ -40,61 +42,60 @@ static int	in_shadow(t_scene const *scene, t_intersect const *intersect,
 	t_ray		ray;
 
 	l_dist = v_distance_to(intersect->point, light->origin);
-	ray.origin = intersect->point;
+	ray.origin = v_add(intersect->point, v_scalarmul(intersect->normal, O_MIN_DIST));
 	ray.dir = v_direction_to(intersect->point, light->origin);
-	ray.origin = ray_forward(&ray, O_MIN_DIST);
 	m_dist = compute_closest_intersect(scene, &ray, &m_intersect);
 	if (m_dist >= 0 && m_dist < l_dist)
 		return (1);
 	return (0);
 }
 
-static t_color	compute_phong(t_scene const *scene, t_list *lights, 
-		t_intersect const *intersect, t_v3 view_dir)
+static void	compute_lights(t_color *color, t_scene const *scene,
+		t_intersect const *intersect)
 {
-	t_color	color;
-	t_v3	l;
-	t_v3	r;
+	t_list	*lights;
+	t_v3	v;
 	t_light	*light;
 	double	d;
-	double	s;
-	int		shadowed;
 
-	color = phong_ambiant(&scene->ambiant.color, &intersect->obj->mat.reflection_ratio);
+	lights = scene->lights;
 	while (lights)
 	{
 		light = lights->content;
-		l = v_direction_to(intersect->point, (light->origin));
-		shadowed = in_shadow(scene, intersect, light);
-		d = v_dot(l, intersect->normal);
-		if (!shadowed && d > 0)
+		v = v_direction_to(intersect->point, light->origin);
+		d = v_dot(v, intersect->normal);
+		if (d > 0 && !in_shadow(scene, intersect, light))
 		{
-			color = color_add_normalized(color, phong_diffuse(&light->color,
-						&intersect->obj->mat.reflection_ratio, d));
-			r = v_add(v_scalarmul(intersect->normal, 2 * v_dot(l, intersect->normal)), v_scalarmul(l, -1));
-			s = v_dot(r, view_dir);
-			if (s > 0)
+			color_add_normalized(color, color_smul(color_vmul(light->color,
+							&intersect->obj->mat.diffuse_ratio), d));
+			v = v_symmetric(v, intersect->normal);
+			d = v_dot(v, intersect->viewer);
+			if (d > 0)
 			{
-				color = color_add_bounded(color, phong_specular(&light->color,
-							intersect->obj->mat.specular_ratio, pow(s, intersect->obj->mat.shininess)));
+				color_add_bounded(color, color_smul(light->color, pow(d,
+					intersect->obj->mat.shininess) * intersect->obj->mat.specular_ratio));
 			}
 		}
 		lights = lights->next;
 	}
-	return (color);
 }
 
-static t_color	compute_color(t_scene const *scene, t_ray const *ray){
-	t_color	color;
+static t_color	compute_color(t_scene const *scene, t_ray const *ray, int depth){
+	t_color		color;
 	t_intersect	intersect;
+	t_ray		r_ray;
 
+	if (depth > RAY_MAX_DEPTH)
+		return C_BLACK;
 	if (compute_closest_intersect(scene, ray, &intersect) >= 0)
 	{
-//		printf("closest intersect: "); obj_print(intersect.obj); printf("\n");
-		color = compute_phong(scene, scene->lights, &intersect, v_scalarmul(ray->dir, -1));
+		r_ray.origin = v_add(intersect.point, v_scalarmul(intersect.normal, O_MIN_DIST));
+		r_ray.dir = v_symmetric(intersect.viewer, intersect.normal);
+		color = color_vmul(scene->ambiant.color, &intersect.obj->mat.diffuse_ratio);
+		color_add_normalized(&color, color_smul(compute_color(scene, &r_ray, depth + 1), intersect.obj->mat.reflection_ratio));
+		compute_lights(&color, scene, &intersect);
 	}
 	else{
-//		printf("no intersect\n");
 		color = scene->background;
 	}
 	return (color);
@@ -114,8 +115,7 @@ void	compute_scene(t_scene const *scene, t_img *img)
 		while (i < WIN_W)
 		{
 			ray = cam_pixel_to_ray(&scene->cam, i, j);
-//			ray_print(&ray);printf("\n");
-			p_color = compute_color(scene, &ray);
+			p_color = compute_color(scene, &ray, 0);
 			img_set_pixel(img, i, j, p_color);
 			++i;
 		}

@@ -2,17 +2,17 @@
 
 #include <stdio.h>
 
-void	v3_print(t_v3 const *v)
+void	v3_print(t_v3 const v)
 {
-	printf("(%f, %f, %f)", v->x, v->y, v->z);
+	printf("(%f, %f, %f)", v.x, v.y, v.z);
 }
 
 void	ray_print(t_ray const *ray)
 {
 	printf("ray[");
-	v3_print(&ray->origin);
+	v3_print(ray->origin);
 	printf(" -> ");
-	v3_print(&ray->dir);
+	v3_print(ray->dir);
 	printf("]");
 }
 
@@ -25,7 +25,7 @@ void	obj_print(t_obj const *obj)
 		case O_PLANE:
 			printf("plane");
 			printf("[n = ");
-			v3_print(&obj->geometry.plane.normal);
+			v3_print(obj->geometry.plane.normal);
 			printf(", d = %f]", obj->geometry.plane.dist);
 			break;
 		default:
