@@ -11,10 +11,10 @@ t_v3	v_normalize(t_v3 v)
 	float	norm;
 	t_v3	n;
 
-	norm = v.x*v.x + v.y*v.y + v.z*v.z;
-	n.x = v.x / sqrt(norm);
-	n.y = v.y / sqrt(norm);
-	n.z = v.z / sqrt(norm);
+	norm = v_norm(v);
+	n.x = v.x / norm;
+	n.y = v.y / norm;
+	n.z = v.z / norm;
 	return (n);
 }
 
@@ -41,6 +41,16 @@ t_v3	v_scalarmul(t_v3 v, double s)
 t_v3	v_direction_to(t_v3 origin, t_v3 dest)
 {
 	return (v_normalize(v_add(v_scalarmul(origin, -1), dest)));
+}
+
+double	v_norm(t_v3 v)
+{
+	return (sqrt(v.x*v.x + v.y*v.y + v.z*v.z));
+}
+
+double	v_distance_to(t_v3 origin, t_v3 dest)
+{
+	return (v_norm(v_add(v_scalarmul(origin, -1), dest)));
 }
 
 t_v3	ray_forward(t_ray const *ray, double dist)

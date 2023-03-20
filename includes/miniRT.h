@@ -22,6 +22,31 @@ int		loop_hook(t_ses *ses);
 
 
 //---------------------------------//
+//              utils              //
+//---------------------------------//
+typedef struct s_v3
+{
+	double	x;
+	double	y;
+	double	z;
+}	t_v3;
+
+static const t_v3	V_ZERO = {0, 0, 0};
+
+t_v3	v_scalarmul(t_v3 v, double s);
+t_v3	v_add(t_v3 a, t_v3 b);
+double	v_norm(t_v3 v);
+t_v3	v_normalize(t_v3 v);
+double	v_dot(t_v3 a, t_v3 b);
+t_v3	v_direction_to(t_v3 origin, t_v3 dest);
+double	v_distance_to(t_v3 origin, t_v3 dest);
+
+double	min(double a, double b);
+double	max(double a, double b);
+double	solve_quadratic(double a, double b, double c);
+
+
+//---------------------------------//
 //              Image              //
 //---------------------------------//
 typedef struct s_color
@@ -55,13 +80,7 @@ void	img_set_pixel(t_img *img, int i, int j, t_color color);
 //           RT Objects            //
 //---------------------------------//
 # include <libft.h>
-
-typedef struct s_v3
-{
-	double	x;
-	double	y;
-	double	z;
-}	t_v3;
+static const double	O_MIN_DIST = 0.00001;
 
 typedef struct s_ray
 {
@@ -95,6 +114,12 @@ typedef struct s_plane
 	t_v3	normal;
 }	t_plane;
 
+typedef struct s_sphere
+{
+	double	r;
+	t_v3	origin;
+}	t_sphere;
+
 typedef struct s_mat
 {
 	t_v3	reflection_ratio;
@@ -104,6 +129,7 @@ typedef struct s_mat
 
 typedef enum e_OType
 {
+	O_SPHERE,
 	O_PLANE,
 	O_LAST
 }	t_OType;
@@ -114,7 +140,8 @@ typedef struct s_obj
 	t_mat	mat;
 	union u_obj
 	{
-		t_plane	plane;
+		t_plane		plane;
+		t_sphere	sphere;
 	}	geometry;
 }	t_obj;
 
@@ -137,22 +164,37 @@ typedef struct s_intersect
 void	init_cam_dir(t_cam *cam, t_v3 const dir);
 t_ray	cam_pixel_to_ray(t_cam const *cam, int i, int j);
 
-static const t_v3	V_ZERO = {0, 0, 0};
-t_v3	v_scalarmul(t_v3 v, double s);
-t_v3	v_add(t_v3 a, t_v3 b);
-t_v3	v_normalize(t_v3 v);
-double	v_dot(t_v3 a, t_v3 b);
-t_v3	v_direction_to(t_v3 origin, t_v3 dest);
 t_v3	ray_forward(t_ray const *ray, double dist);
 
 double	plane_intersect(t_ray const *ray, t_obj const *obj,
 						t_intersect *intersect);
+double	sphere_intersect(t_ray const *ray, t_obj const *obj,
+						t_intersect *intersect);
 static double(*const obj_intersect[O_LAST])(t_ray const *ray, t_obj const *obj,
 		t_intersect *intersect) = {
+	&sphere_intersect,
 	&plane_intersect,
 };
 
 
 void	compute_scene(t_scene const *scene, t_img *img);
 
+
+//---------------------------------//
+//           Phong Model           //
+//---------------------------------//
+
+t_color	color_add_normalized(t_color c1, t_color c2);
+t_color	color_add_bounded(t_color c1, t_color c2);
+t_color	phong_ambiant(t_color const *ambiant, t_v3 const *ratio);
+t_color	phong_diffuse(t_color const *light, t_v3 const *ratio, double d);
+t_color	phong_specular(t_color const *light, double ratio, double s);
+
+
+//---------------------------------//
+//             DEBUG               //
+//---------------------------------//
+void	v3_print(t_v3 const *v);
+void	ray_print(t_ray const *ray);
+void	obj_print(t_obj const *obj);
 #endif

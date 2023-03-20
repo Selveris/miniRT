@@ -16,7 +16,8 @@ MLX			= $(MLX_DIR)/libmlx.a
 HEAD_NAME	= miniRT.h
 HEADERS		:= $(patsubst %.h, $(INCL_DIR)/%.h, $(HEAD_NAME))
 
-SRCS_NAME	= miniRT.c conf.c camera.c vector.c objects.c compute.c img.c
+SRCS_NAME	= miniRT.c conf.c camera.c vector.c objects.c compute.c img.c print.c utils.c \
+			  phong.c
 SRCS		:= $(patsubst %.c, $(SRCS_DIR)/%.c, $(SRCS_NAME))
 OBJS 		:= $(patsubst $(SRCS_DIR)/%.c, $(OBJS_DIR)/%.o, $(SRCS))
 
