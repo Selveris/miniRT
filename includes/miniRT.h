@@ -8,8 +8,8 @@
 # define WIN_W			1920
 # define WIN_H			1080
 # define DESTROY_NOTIFY	17
-# define RAY_MAX_DEPTH	4
-# define ALIASING		4
+# define RAY_MAX_DEPTH	6
+# define ALIASING		3
 # define THREAD_C		6
 
 # include <pthread.h>
@@ -198,6 +198,7 @@ typedef struct s_thread
 void	thread_start_compute(t_thread *threads, t_scene *scene, t_img *img);
 int		thread_all_done(t_thread *threads);
 void	thread_join_all(t_thread *threads);
+int		thread_percent(t_thread *threads);
 
 
 //---------------------------------//

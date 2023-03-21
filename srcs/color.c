@@ -50,10 +50,10 @@ t_color	color_average(t_color *colors, size_t size)
 	size_t	i;
 	t_color	color;
 
-	i = 0;
 	c[0] = 0;
 	c[1] = 0;
 	c[2] = 0;
+	i = 0;
 	while (i < size)
 	{
 		c[0] += colors[i].red;

@@ -92,7 +92,7 @@ t_color	compute_color(t_scene const *scene, t_ray const *ray, int depth){
 		r_ray.origin = v_add(intersect.point, v_scalarmul(intersect.normal, O_MIN_DIST));
 		r_ray.dir = v_symmetric(intersect.viewer, intersect.normal);
 		color = color_vmul(scene->ambiant.color, &intersect.obj->mat.diffuse_ratio);
-		if (intersect.obj->mat.reflection_ratio)
+		if (intersect.obj->mat.reflection_ratio && depth < RAY_MAX_DEPTH)
 			color_add_normalized(&color, color_smul(compute_color(scene, &r_ray, depth + 1), intersect.obj->mat.reflection_ratio));
 		compute_lights(&color, scene, &intersect);
 	}

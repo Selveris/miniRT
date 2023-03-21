@@ -39,7 +39,7 @@ void	*load_scene(void *arg)
 	plane2->type = O_PLANE;
 	plane2->geometry.plane.normal = (t_v3) {0, 0, 1};
 	plane2->geometry.plane.dist = 10;
-	t_v3	plane2_color = (t_v3) {0, 80, 150};
+	t_v3	plane2_color = (t_v3) {0, 0, 0}; //{0, 80, 150};
 	plane2->mat.diffuse_ratio = v_scalarmul(plane2_color, 1.0/255);
 	plane2->mat.specular_ratio = 0;
 	plane2->mat.shininess = 32;
@@ -135,7 +135,11 @@ int	loop_hook(t_ses *ses)
 		}
 		else if (!thread_all_done(ses->threads))
 		{
-			mlx_string_put(ses->mlx, ses->win, WIN_W / 3, WIN_H / 2, (255 << 16) + (255 << 8) + 255, "Computing Scene");
+			char	*p = ft_itoa(thread_percent(ses->threads));
+			char	*str = ft_strjoin("Computing Scene: ", p);
+			mlx_string_put(ses->mlx, ses->win, WIN_W / 3, WIN_H / 2, (255 << 16) + (255 << 8) + 255, str);
+			free(p);
+			free(str);
 		}
 		else
 		{

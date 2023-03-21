@@ -3,6 +3,22 @@
 
 #include <stdio.h>
 
+int	thread_percent(t_thread *threads)
+{
+	int	p;
+	int	i;
+
+	i = 0;
+	p = 0;
+	while (i < THREAD_C)
+	{
+		p += threads[i].done;
+		++i;
+	}
+	p /= THREAD_C;
+	return (p);
+}
+
 void	thread_join_all(t_thread *threads)
 {
 	t_thread	*thread;
@@ -26,7 +42,7 @@ int	thread_all_done(t_thread *threads)
 	i = 0;
 	while (i < THREAD_C)
 	{
-		if (!threads[i].done)
+		if (!(threads[i].done / 100))
 			return (0);
 		++i;
 	}
@@ -39,8 +55,10 @@ static void	*thread_compute_scene(void *arg)
 	t_ray		rays[ALIASING * ALIASING];
 	t_color		p_color[ALIASING * ALIASING];
 	int			a;
+	size_t		t;
 
 	thread = arg;
+	t = thread->p;
 	while (thread->j < WIN_H && thread->p > 0)
 	{
 		while (thread->i < WIN_W && thread->p > 0)
@@ -55,11 +73,12 @@ static void	*thread_compute_scene(void *arg)
 			img_set_pixel(thread->img, thread->i, thread->j, color_average(p_color, ALIASING * ALIASING));
 			++thread->i;
 			--thread->p;
+			thread->done = 100 - (thread->p * 100 / t);
 		}
 		thread->i = 0;
 		++thread->j;
 	}
-	thread->done = 1;
+	thread->done = 100;
 	return (NULL);
 }
 
