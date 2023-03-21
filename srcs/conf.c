@@ -36,6 +36,7 @@ t_ses	*start_session(void)
 	mlx_hook(ses->win, DESTROY_NOTIFY, 0, close_session, ses);
 	mlx_key_hook(ses->win, key_hook, ses);
 	mlx_loop_hook(ses->mlx, loop_hook, ses);
+	ses->loading = 1;
 	return (ses);
 }
 
@@ -52,11 +53,5 @@ int	key_hook(int key, t_ses *ses)
 {
 	if (key == 53)
 		close_session(ses);
-	return (0);
-}
-
-int	loop_hook(t_ses *ses)
-{
-	(void) ses;
 	return (0);
 }

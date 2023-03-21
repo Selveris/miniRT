@@ -80,7 +80,7 @@ static void	compute_lights(t_color *color, t_scene const *scene,
 	}
 }
 
-static t_color	compute_color(t_scene const *scene, t_ray const *ray, int depth){
+t_color	compute_color(t_scene const *scene, t_ray const *ray, int depth){
 	t_color		color;
 	t_intersect	intersect;
 	t_ray		r_ray;
@@ -92,7 +92,8 @@ static t_color	compute_color(t_scene const *scene, t_ray const *ray, int depth){
 		r_ray.origin = v_add(intersect.point, v_scalarmul(intersect.normal, O_MIN_DIST));
 		r_ray.dir = v_symmetric(intersect.viewer, intersect.normal);
 		color = color_vmul(scene->ambiant.color, &intersect.obj->mat.diffuse_ratio);
-		color_add_normalized(&color, color_smul(compute_color(scene, &r_ray, depth + 1), intersect.obj->mat.reflection_ratio));
+		if (intersect.obj->mat.reflection_ratio)
+			color_add_normalized(&color, color_smul(compute_color(scene, &r_ray, depth + 1), intersect.obj->mat.reflection_ratio));
 		compute_lights(&color, scene, &intersect);
 	}
 	else{

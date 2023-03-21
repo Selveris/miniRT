@@ -10,17 +10,9 @@
 # define DESTROY_NOTIFY	17
 # define RAY_MAX_DEPTH	8
 # define ALIASING		4
+# define THREAD_C		4
 
-typedef struct s_session
-{
-	void	*mlx;
-	void	*win;
-}	t_ses;
-
-t_ses	*start_session(void);
-int		close_session(t_ses *ses);
-int		key_hook(int key, t_ses *ses);
-int		loop_hook(t_ses *ses);
+# include <pthread.h>
 
 
 //---------------------------------//
@@ -183,13 +175,49 @@ static double(*const obj_intersect[O_LAST])(t_ray const *ray, t_obj const *obj,
 	&plane_intersect,
 };
 
-
+t_color	compute_color(t_scene const *scene, t_ray const *ray, int depth);
 void	compute_scene(t_scene const *scene, t_img *img);
 
 
 //---------------------------------//
-//           Phong Model           //
+//             Threads             //
 //---------------------------------//
+typedef struct s_thread
+{
+	pthread_t	pthread;
+	t_scene		*scene;
+	t_img		*img;
+	size_t		j_from;
+	size_t		i_from;
+	size_t		p;
+	int			done;
+}	t_thread;
+
+void	thread_start_compute(t_thread *threads, t_scene *scene, t_img *img);
+int		thread_all_done(t_thread *threads);
+void	thread_join_all(t_thread *threads);
+
+
+//---------------------------------//
+//             Session             //
+//---------------------------------//
+typedef struct s_session
+{
+	void		*mlx;
+	void		*win;
+	t_scene		*scene;
+	t_img		*img;
+	t_thread	threads[THREAD_C];
+//	pthread_t	threads[THREAD_C];
+//	int			thread_done[THREAD_C];
+	int			loading;
+	int			computing;
+}	t_ses;
+
+t_ses	*start_session(void);
+int		close_session(t_ses *ses);
+int		key_hook(int key, t_ses *ses);
+int		loop_hook(t_ses *ses);
 
 
 //---------------------------------//
