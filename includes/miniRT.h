@@ -8,9 +8,9 @@
 # define WIN_W			1920
 # define WIN_H			1080
 # define DESTROY_NOTIFY	17
-# define RAY_MAX_DEPTH	8
+# define RAY_MAX_DEPTH	4
 # define ALIASING		4
-# define THREAD_C		4
+# define THREAD_C		6
 
 # include <pthread.h>
 
@@ -58,6 +58,7 @@ void	color_add_normalized(t_color *base, t_color add);
 void	color_add_bounded(t_color *base, t_color add);
 t_color	color_vmul(t_color const base, t_v3 const *ratio);
 t_color	color_smul(t_color const base, double ratio);
+t_color	color_average(t_color *colors, size_t size);
 
 typedef struct s_img
 {
@@ -161,7 +162,8 @@ typedef struct s_intersect
 }	t_intersect;
 
 void	init_cam_dir(t_cam *cam, t_v3 const dir);
-t_ray	cam_pixel_to_ray(t_cam const *cam, int i, int j);
+//t_ray	cam_pixel_to_ray(t_cam const *cam, int i, int j);
+void	cam_pixel_to_rays(t_ray *rays, t_cam const *cam, int i, int j);
 
 t_v3	ray_forward(t_ray const *ray, double dist);
 
@@ -187,8 +189,8 @@ typedef struct s_thread
 	pthread_t	pthread;
 	t_scene		*scene;
 	t_img		*img;
-	size_t		j_from;
-	size_t		i_from;
+	size_t		j;
+	size_t		i;
 	size_t		p;
 	int			done;
 }	t_thread;

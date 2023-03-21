@@ -101,7 +101,7 @@ t_color	compute_color(t_scene const *scene, t_ray const *ray, int depth){
 	}
 	return (color);
 }
-
+/*
 void	compute_scene(t_scene const *scene, t_img *img)
 {
 	t_ray	ray;
@@ -122,4 +122,4 @@ void	compute_scene(t_scene const *scene, t_img *img)
 		}
 		++j;
 	}
-}
+}*/

@@ -36,26 +36,28 @@ int	thread_all_done(t_thread *threads)
 static void	*thread_compute_scene(void *arg)
 {
 	t_thread	*thread;
-	t_ray		ray;
-	t_color		p_color;
-	size_t		i;
-	size_t		j;
+	t_ray		rays[ALIASING * ALIASING];
+	t_color		p_color[ALIASING * ALIASING];
+	int			a;
 
 	thread = arg;
-	j = thread->j_from;
-	i = thread->i_from;
-	while (j < WIN_H && thread->p > 0)
+	while (thread->j < WIN_H && thread->p > 0)
 	{
-		while (i < WIN_W && thread->p > 0)
+		while (thread->i < WIN_W && thread->p > 0)
 		{
-			ray = cam_pixel_to_ray(&thread->scene->cam, i, j);
-			p_color = compute_color(thread->scene, &ray, 0);
-			img_set_pixel(thread->img, i, j, p_color);
-			++i;
+			a = 0;
+			cam_pixel_to_rays(rays, &thread->scene->cam, thread->i, thread->j);
+			while (a < ALIASING * ALIASING)
+			{
+				p_color[a] = compute_color(thread->scene, rays + a, 0);
+				++a;
+			}
+			img_set_pixel(thread->img, thread->i, thread->j, color_average(p_color, ALIASING * ALIASING));
+			++thread->i;
 			--thread->p;
 		}
-		i = 0;
-		++j;
+		thread->i = 0;
+		++thread->j;
 	}
 	thread->done = 1;
 	return (NULL);
@@ -77,8 +79,8 @@ void	thread_start_compute(t_thread *threads, t_scene *scene, t_img *img)
 		thread->scene = scene;
 		thread->img = img;
 		thread->done = 0;
-		thread->j_from = s / WIN_W;
-		thread->i_from = s % WIN_W;
+		thread->j = s / WIN_W;
+		thread->i = s % WIN_W;
 		thread->p = p;
 		if (i == THREAD_C - 1)
 			thread->p += (WIN_W * WIN_H) % THREAD_C;

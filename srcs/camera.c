@@ -28,7 +28,7 @@ static t_v3	cam_to_world(t_cam const *cam, t_v3 const v)
 			+ cos(cam->pitch)*cos(cam->yaw)*v.z;
 	return (new);
 }
-t_ray	cam_pixel_to_ray(t_cam const *cam, int i, int j){
+/*t_ray	cam_pixel_to_ray(t_cam const *cam, int i, int j){
 	t_v3	p;
 	t_ray	ray;
 
@@ -47,4 +47,30 @@ t_ray	cam_pixel_to_ray(t_cam const *cam, int i, int j){
 	ray.origin = cam->origin;
 	ray.dir = cam_to_world(cam, v_normalize(p));
 	return (ray);
+}*/
+static t_v3	cam_pixel_vector(t_cam const *cam, int i, int j, int a)
+{
+	t_v3	p;
+
+	p.x = i - WIN_W / 2.0 + (a % ALIASING + 0.5) / ALIASING;
+	p.y = WIN_H / 2.0 - j - (a / ALIASING + 0.5) / ALIASING;
+	if (cam->fov == 180)
+		p.z = 0;
+	else if (cam->fov == 0)
+		p.z = -WIN_W / (2 * tan(0.001f));
+	else
+		p.z = -WIN_W / (2 * tan(cam->fov / 2.0f));
+	return (cam_to_world(cam, v_normalize(p)));
 }
+void	cam_pixel_to_rays(t_ray *rays, t_cam const *cam, int i, int j){
+	int		a;
+
+	a = 0;
+	while (a < ALIASING * ALIASING)
+	{
+		rays[a].origin = cam->origin;
+		rays[a].dir = cam_pixel_vector(cam, i, j, a);
+		++a;
+	}
+}
+

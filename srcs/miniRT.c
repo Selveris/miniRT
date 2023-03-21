@@ -155,6 +155,10 @@ int	main(int argc, char **argv)
 
 	(void) argc;
 	(void) argv;
+	t_color	colors[3];
+	colors[0] = (t_color){115, 0, 255};
+	colors[1] = (t_color){255, 255, 255};
+	colors[2] = (t_color){25, 25, 50};
 	
 	ses = start_session();
 	if (!ses)

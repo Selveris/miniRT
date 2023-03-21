@@ -43,3 +43,26 @@ t_color	color_smul(t_color const base, double ratio)
 	color.blue = base.blue * ratio;	
 	return (color);
 }
+
+t_color	color_average(t_color *colors, size_t size)
+{
+	int		c[3];
+	size_t	i;
+	t_color	color;
+
+	i = 0;
+	c[0] = 0;
+	c[1] = 0;
+	c[2] = 0;
+	while (i < size)
+	{
+		c[0] += colors[i].red;
+		c[1] += colors[i].green;
+		c[2] += colors[i].blue;
+		++i;
+	}
+	color.red = c[0] / size;
+	color.green = c[1] / size;
+	color.blue = c[2] / size;
+	return (color);
+}
